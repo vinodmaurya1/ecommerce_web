@@ -20,6 +20,7 @@
     "nodemailer": "^6.9.10",
     "nodemailer-smtp-transport": "^2.7.4",
     "path": "^0.12.7",
+    "stripe": "^14.20.0",
     "uuid": "^9.0.1"
   }
 }

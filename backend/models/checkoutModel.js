@@ -9,7 +9,8 @@ const checkoutSchema = new Schema({
     name: { type: String, required: true },
     amount: { type: Number, required: true }
   }],
-  totalAmount: { type: Number, required: true }
+  totalAmount: { type: Number, required: true },
+  paymentStatus: { type: Number, required: true },
 }, { timestamps: true });
 
 checkoutSchema.set("toJSON", {

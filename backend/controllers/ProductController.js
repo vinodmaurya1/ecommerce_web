@@ -153,13 +153,38 @@ exports.ActiveProduct = async (req, res) => {
 
 exports.GetAllProduct = async (req, res) => {
   try {
-    const product = await Product.find();
-    const data = product.map((products) => ({
-      ...products._doc,
+    let query = Product.find();
+
+    if (req.query.category) {
+      query = query.find({ category: req.query.category });
+    }
+
+    // sort by aesc , desc
+
+    if (req.query._sort && req.query._order) {
+      let sortCriteria = {};
+      sortCriteria[req.query._sort] = req.query._order === 'desc' ? -1 : 1;
+      query = query.sort(sortCriteria);
+    }
+
+
+    if (req.query._page && req.query._limit) {
+      const pageLimit = req.query._limit;
+      const page = req.query._page;
+      query = query.skip(pageLimit*(page-1)).limit(pageLimit);
+    }
+
+
+
+    const products = await query.exec();
+
+    const data = products.map((product) => ({
+      ...product._doc,
       product_img_url: `${req.protocol}://${req.get("host")}/${
-        products.product_img
+        product.product_img
       }`,
     }));
+
     return res.status(200).json({
       success: true,
       message: "All product list",
@@ -167,15 +192,42 @@ exports.GetAllProduct = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal Server Error" });
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 
+
+
+
+
 exports.AllCartDetails = async (req, res) => {
   try {
-    const cart = await Cart.find();
+
+    const token = req.header("Authorization");
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication failed. Token missing.",
+      });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+      if (err) {
+        return res.status(401).json({
+          success: false,
+          message: "Authentication failed. Invalid token.",
+        });
+      }
+
+      const user = await User.findOne({ email: decoded.email });
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: "Authentication failed. User not found.",
+        });
+      }
+
+    const cart = await Cart.find({ user_id: user._id });
     const cartChange = cart.length > 0 ? cart[0] : {};
     if (cartChange.products && cartChange.products.length > 0) {
       cartChange.products.forEach((product) => {
@@ -189,6 +241,7 @@ exports.AllCartDetails = async (req, res) => {
       message: "All cart product list",
       data: cartChange,
     });
+  })
   } catch (err) {
     console.error(err);
     return res

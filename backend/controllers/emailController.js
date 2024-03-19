@@ -65,12 +65,14 @@ const transporter = nodemailer.createTransport(
 // );
 
 
-exports.sendEmail = async (req, res) => {
+exports.sendEmail = async ({to, subject, text, html}) => {
+
   let mailOptions = {
-    from: process.env.MAIL_FROM_ADDRESS, // Sender address
-    to: process.env.MAIL_TO_ADDRESS, // List of recipients
-    subject: req.body.sub, // Subject line
-    text: req.body.desc, // Plain text body
+    from: process.env.MAIL_FROM_ADDRESS, 
+    to: to, 
+    subject: subject, 
+    text: text,
+    html: html,
   };
 
   try {
@@ -106,7 +108,6 @@ exports.sendEmail = async (req, res) => {
       }
       console.log("Message sent successfully!");
         //   console.log("Message ID:", info);
-
       if (info) {
         return res.status(200).json({
           success: true,

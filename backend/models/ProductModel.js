@@ -6,6 +6,7 @@ const userSchema = new Schema(
     user_id:{ type: Schema.Types.ObjectId, required: true},
     name: { type: String, required: true},
     description: { type: String, required: true},
+    category: { type: Number , default:1},
     quantity: { type: Number, required: true},
     product_img: { type: String, required: true},
     amount: { type: Number, required: true },

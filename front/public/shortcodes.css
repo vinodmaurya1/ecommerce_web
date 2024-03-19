@@ -3862,9 +3862,27 @@
   line-height: 26px;
   color: #121212;
 }
+.pagination-job li button {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 26px;
+  color: #121212;
+}
 
 .pagination-job li.current a,
 .pagination-job li a:hover {
+  background: #0a3161;
+  color: #fff;
+}
+.pagination-job li.current button,
+.pagination-job li button:hover {
   background: #0a3161;
   color: #fff;
 }

@@ -89,6 +89,7 @@ import SelectLocation from "./pages/SelectLocation";
 import UsersView from "./pages/UsersView";
 import ProfileInfo from "./pages/ProfileInfo";
 import AdminPanel from "./pages/AdminPanel";
+import StripePayment from "./pages/StripePayment";
 const App = () => {
   let routes = useRoutes([
     { path: "/", element: <Home_v3 /> },
@@ -168,6 +169,7 @@ const App = () => {
     { path: "/profile_info", element: <ProfileInfo /> },
     { path: "/admin", element: <AdminPanel /> },
     { path: "/select_location/:city_name/:city_id", element: <SelectLocation /> },
+    { path: "/payment-initiate", element: <StripePayment /> },
   ]);
   return routes;
 };

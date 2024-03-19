@@ -10,6 +10,14 @@ const Cart = cartModel.Cart;
 const Order = orderModel.Order;
 const Checkout = checkoutModel.Checkout;
 
+
+
+// success link
+//http://localhost:3000/profile_info?payment_intent=pi_3OusJVSIntRVZuwI0QbFPQJM&
+//payment_intent_client_secret=pi_3OusJVSIntRVZuwI0QbFPQJM_secret_lpk66sfIrXdAtw19KVVFBr9Up&
+//redirect_status=succeeded
+
+
 exports.Checkout = async (req, res) => {
   try {
     const token = req.header("Authorization");

@@ -12,6 +12,8 @@ const bookingController = require('../controllers/bookingController');
 const { authorization } = require("../middleware/auth");
 const multer = require('multer');
 const kycUploadMiddleware = require("../middleware/kycUploadMiddleware");
+const nodemailer = require("nodemailer");
+
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -84,7 +86,30 @@ router.post('/booking',authorization, bookingController.Booking);
 router.get('/booking_detail',authorization, bookingController.GetBooking);
 
 
-router.post('/email_send', emailController.sendEmail)
+
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+    port: 587,
+    secure:false,
+    auth: {
+      user: process.env.MAIL_USERNAME,
+      pass:process.env.MAIL_PASSWORD,
+    },
+  }
+);
+
+
+// router.post('/email_send', emailController.sendEmail)
+router.post('/email_send', async (req,res)=>{
+  let info = await transporter.sendMail({
+    from: '"Ecommerce" <order@ecommerce.com>',
+    to:"vinodmaurya4561@gmail",
+    subject:"Your order",
+    text:"Your description",
+    html:"<b>hello your or is here !</b>",
+  })
+  res.json(info)
+})
 // router.use('/uploads', express.static('uploads'));
 
 // router.use((req, res, next) => {

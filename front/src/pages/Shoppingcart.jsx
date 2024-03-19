@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import Header2 from "../components/header/Header2";
 import Breadcrumb from "../components/breadcrumb";
 import Footer from "../components/footer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Gotop from "../components/gotop";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { Collapse } from "react-collapse";
@@ -18,10 +18,11 @@ import { cartDetail, showUserDetail } from "../redux/stateSlice/authSlice";
 import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
 
 Shoppingcart.propTypes = {};
- 
+
 function Shoppingcart(props) {
   const { user, cart } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [counts, setCounts] = useState({});
   const [couponValue, setCouponValue] = useState("");
   const [toggle, setToggle] = useState({
@@ -55,7 +56,7 @@ function Shoppingcart(props) {
 
   const fetchData = () => {
     axios
-      .get(`${api_url}/get_all_product_cart`)
+      .get(`${api_url}/get_all_product_cart`, {headers:{Authorization:loginToken}} )
       .then((res) => {
         console.log(res.data);
         setProductData(res?.data?.data.products);
@@ -176,7 +177,7 @@ function Shoppingcart(props) {
       await axios
         .post(
           `${api_url}/booking`,
-          {user_id: user?.user?._id},
+          { user_id: user?.user?._id },
           {
             headers: { Authorization: loginToken },
           }
@@ -204,6 +205,10 @@ function Shoppingcart(props) {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handlePayment = async () => {
+    navigate("/payment-initiate" , { state: { totalAmount : cart?.data?.subTotal ,userId: user?.user?._id , userName:user?.user?.name , userEmail:user?.user?.email , orderId:"4893767569kjnfdjhu8754dfkn5487"} });
   };
 
   return (
@@ -824,15 +829,12 @@ function Shoppingcart(props) {
                           <div className="title">Total</div>
                           <div className="price">{`₹${productDetail.subTotal}`}</div>
                         </div>
-                        <button onClick={handleCheckout} className="btn">
-                          proceed to checkout
+                        <button onClick={handlePayment} className="btn">
+                          proceed to payment
                         </button>
-                        <Link to="#" className="payment">
-                          <img
-                            src={require("../assets/images/review/payment.png")}
-                            alt="images"
-                          />
-                        </Link>
+                        {/* <Link to="/payment-initiate" className="payment">
+                          Payment View
+                        </Link> */}
                       </div>
                     </div>
                   </div>

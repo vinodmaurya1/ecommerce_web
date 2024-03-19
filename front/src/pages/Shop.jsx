@@ -22,7 +22,6 @@ function Shop(props) {
     status: false,
   });
   const [isShowMobile, setShowMobile] = useState(false);
-  const [productData, setProductData] = useState([""]);
 
   const handleToggle = (key) => {
     if (toggle.key === key) {
@@ -45,20 +44,9 @@ function Shop(props) {
       : getMobile.classList.remove("modal-menu--open");
   };
 
-  useEffect(() => {
-    const fetchData = () => {
-      axios
-        .get(`${api_url}/get_all_product`)
-        .then((res) => {
-          console.log(res.data);
-          setProductData(res?.data?.data)
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    };
-    fetchData();
-  }, []);
+
+
+
 
   return (
     <>
@@ -551,7 +539,7 @@ function Shop(props) {
 
       <Breadcrumb title="Shop" className="breadcrumb-section" />
 
-      <ShopS1 data={productData} />
+      <ShopS1 />
 
       <Footer />
       <Gotop />
