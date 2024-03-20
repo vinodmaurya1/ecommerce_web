@@ -18,6 +18,47 @@ mongoose
 
 app.use("/", router);
 
+
+const endpointSecret = process.env.ENDPOINT_SECRET;
+
+
+app.post(
+  '/webhook',
+  express.raw({ type: 'application/json' }),
+  async (request, response) => {
+    const sig = request.headers['stripe-signature'];
+
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+    } catch (err) {
+      response.status(400).send(`Webhook Error: ${err.message}`);
+      return;
+    }
+
+    // Handle the event
+    switch (event.type) {
+      case 'payment_intent.succeeded':
+        const paymentIntentSucceeded = event.data.object;
+
+        const order = await Order.findById(
+          paymentIntentSucceeded.metadata.orderId
+        );
+        order.paymentStatus = 'received';
+        await order.save();
+
+        break;
+      // ... handle other event types
+      default:
+        console.log(`Unhandled event type ${event.type}`);
+    }
+
+    // Return a 200 response to acknowledge receipt of the event
+    response.send();
+  }
+);
+
 // app.use(express.static(path.join(__dirname, '../front/build')));
 
 // app.use('*' , (req, res)=>{res.sendFile(path.resolve(__dirname , '../front/build' , 'index.html'))})

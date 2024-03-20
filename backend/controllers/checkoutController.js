@@ -57,6 +57,7 @@ exports.Checkout = async (req, res) => {
         products: cart.products,
         totalAmount: cart.subTotal,
       });
+      
       await order.save();
 
       // Clear the cart

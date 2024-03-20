@@ -191,6 +191,7 @@ function Shoppingcart(props) {
             // setProductData(
             //   productData.filter((product) => product._id !== res.data.data._id)
             // );
+            navigate("/payment-initiate" , { state: { totalAmount : cart?.data?.subTotal ,userId: user?.user?._id , userName:user?.user?.name , userEmail:user?.user?.email , orderId:"4893767569kjnfdjhu8754dfkn5487"} });
             fetchData();
             dispatch(cartDetail());
             dispatch(showUserDetail());
@@ -829,7 +830,7 @@ function Shoppingcart(props) {
                           <div className="title">Total</div>
                           <div className="price">{`₹${productDetail.subTotal}`}</div>
                         </div>
-                        <button onClick={handlePayment} className="btn">
+                        <button onClick={handleCheckout} className="btn">
                           proceed to payment
                         </button>
                         {/* <Link to="/payment-initiate" className="payment">
