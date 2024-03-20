@@ -12,7 +12,7 @@ CandiSec2.propTypes = {};
 function CandiSec2(props) {
   const { data } = props;
   const [modalData, setModalData] = useState("");
-  const [getData, setGetData] = useState(data)
+  const [getData, setGetData] = useState([])
   
 
 

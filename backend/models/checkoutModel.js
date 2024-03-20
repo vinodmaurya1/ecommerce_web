@@ -15,7 +15,7 @@ const checkoutSchema = new Schema({
 
 checkoutSchema.set("toJSON", {
   transform: function (doc, ret, options) {
-    delete ret.password;
+    delete ret.password; 
     return ret;
   },
 });

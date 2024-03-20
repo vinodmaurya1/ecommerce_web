@@ -4,11 +4,11 @@ const authorization = (req, res, next) => {
   try {
     const token = req.header("Authorization");
     if (!token) {
-      return res.status(401).json({ success: false, msg: "Authentication failed Token missing." });
+      return res.status(401).json({ success: false, message: "Authentication failed Token missing." });
     }
     jwt.verify(token, process.env.JWT_SECRET, async (err) => {
       if (err) {
-        return res.status(401).json({ success: false, msg: "Authentication failed Invalid token." });
+        return res.status(401).json({ success: false, message: "Authentication failed Invalid token." });
       }
     })
     next();

@@ -33,7 +33,7 @@ router.post('/signup', authController.signUp)
 router.post('/signin', authController.signIn)
 router.post('/logout', authController.logout)
 router.delete('/user_delete/:id', authController.deleteUser);
-router.get('/user_details',authorization, authController.getUserDetails)
+router.get('/user_details', authController.getUserDetails)
 router.get('/all_user_details', authController.getAllUsersDetails)
 router.post('/user_update',authorization,upload.single('profile_img'), authController.UpdateUserDetails)
 router.get('/get_kyc_details',authorization, authController.getKycDetails)

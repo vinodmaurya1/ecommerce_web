@@ -142,7 +142,7 @@ exports.getUserDetails = async (req, res) => {
           .status(401)
           .json({ success: false, message: "Your token has been expired." });
       }
-
+  
       const userWithoutCircularReferences = user.toJSON();
       // console.log('User Details:', userWithoutCircularReferences);
       // console.log(user)
@@ -169,7 +169,7 @@ exports.getUserDetails = async (req, res) => {
       }
     });
   } catch (err) {
-    console.error(err);
+    console.error("getuser", err);
     return res
       .status(500)
       .json({ success: false, message: "Internal Server Error" });
