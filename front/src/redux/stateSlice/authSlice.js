@@ -22,7 +22,7 @@ export const showUserDetail = createAsyncThunk(
   "showUserDetail",
   async (_, { rejectWithValue }) => {
     try {
-      const loginToken = 'localStorage.getItem("logintoken")';
+      const loginToken = localStorage.getItem("logintoken");
       const response = await axios.get(`${api_url}/user_details`, {
         headers: {
           Authorization: `${loginToken}`,
