@@ -16,10 +16,9 @@ mongoose
   .then(() => console.log("Mongoose is Connected"))
   .catch((err) => console.error(err.message));
 
-app.use("/", router);
 
 
-const endpointSecret = process.env.ENDPOINT_SECRET;
+  const endpointSecret = process.env.ENDPOINT_SECRET;
 
 
 app.post(
@@ -58,6 +57,13 @@ app.post(
     response.send();
   }
 );
+
+
+
+app.use("/", router);
+
+
+
 
 // app.use(express.static(path.join(__dirname, '../front/build')));
 
