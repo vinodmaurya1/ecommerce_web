@@ -35,6 +35,7 @@ const userSchema = new Schema(
     adhar_back: { type: String},
     pan_no: { type: String},
     pan_img: { type: String},
+    resetPasswordToken: { type: String},
   },
   { timestamps: true }
 );

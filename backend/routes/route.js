@@ -32,6 +32,9 @@ const upload = multer({ storage: storage });
 router.post('/signup', authController.signUp)
 router.post('/signin', authController.signIn)
 router.post('/logout', authController.logout)
+router.post('/reset_password_request', authController.resetPasswordRequest)
+router.post('/reset_password', authController.resetPassword)
+router.post('/forget_password', authController.forgetPassword)
 router.delete('/user_delete/:id', authController.deleteUser);
 router.get('/user_details', authController.getUserDetails)
 router.get('/all_user_details', authController.getAllUsersDetails)
@@ -97,6 +100,18 @@ const transporter = nodemailer.createTransport({
     },
   }
 );
+
+
+exports.sendMail = async function ({to, subject, text, html}){
+  let info = await transporter.sendMail({
+      from: '"Ecommerce" <order@ecommerce.com>', // sender address
+      to,
+      subject,
+      text,
+      html
+    });
+  return info;  
+}
 
 
 // router.post('/email_send', emailController.sendEmail)

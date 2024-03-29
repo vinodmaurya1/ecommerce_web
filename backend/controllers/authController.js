@@ -86,7 +86,7 @@ exports.signIn = async (req, res) => {
         .json({ success: false, message: "Authentication failed" });
     }
     const isAuth = bcrypt.compareSync(req.body.password, user.password);
-    console.log(isAuth, "auth");
+    // console.log(isAuth, "auth");
     if (isAuth) {
       const secretKey = process.env.JWT_SECRET;
       const token = jwt.sign({ email: user.email, name: user.name }, secretKey);
@@ -246,6 +246,93 @@ exports.logout = async (req, res) => {
       .json({ success: false, message: "Internal Server Error" });
   }
 };
+
+
+
+exports.resetPasswordRequest = async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found!",
+      });
+    }
+    const token = jwt.sign({ email: user.email}, "reset_password");
+    user.resetPasswordToken = token
+    await user.save()
+    return res
+      .status(200)
+      .json({ success: true, message: "Request has been sent successfully, Please check your email" });
+  } catch (err) {
+    console.error(err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+
+
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { email, password, token } = req.body;
+    const user = await User.findOne({ email: email , resetPasswordToken:token });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found!",
+      });
+    }
+    const hash = bcrypt.hashSync(password, 10);
+    user.password = hash;
+    await user.save()
+    return res
+      .status(200)
+      .json({ success: true, message: "Password has been changed successfully!" });
+  } catch (err) {
+    console.error(err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+
+
+exports.forgetPassword = async (req, res) => {
+  try {
+    const { email, password , new_password} = req.body;
+    const user = await User.findOne({ email: email});
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found!",
+      });
+    }
+    const isAuth = bcrypt.compareSync(password, user.password);
+    if (!isAuth) {
+      return res.status(404).json({
+        success: false,
+        message: "Password not match!",
+      });
+    }
+    const hash = bcrypt.hashSync(new_password, 10);
+    user.password = hash;
+    await user.save()
+    return res
+      .status(200)
+      .json({ success: true, message: "Password has been changed successfully!" });
+  } catch (err) {
+    console.error(err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+
 
 exports.getAllUsersDetails = async (req, res) => {
   try {
