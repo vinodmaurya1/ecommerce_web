@@ -10,7 +10,8 @@ const {
   validMobile,
   validPass,
 } = require("../validation/valid");
-
+const { resetPasswordTemplate } = require("../emailTemplate/emailTemplate");
+const nodemailer = require("nodemailer");
 
 
 exports.signUp = async (req, res) => {
@@ -33,7 +34,6 @@ exports.signUp = async (req, res) => {
         .status(400)
         .send({ status: false, message: "enter a valid email" });
     }
- 
 
     if (!data.phone.trim() || !validMobile.test(data.phone.trim())) {
       return res
@@ -59,7 +59,6 @@ exports.signUp = async (req, res) => {
       });
     }
 
-
     const user = new User(req.body);
     const token = jwt.sign({ email: req.body.email }, process.env.JWT_SECRET);
     const hash = bcrypt.hashSync(req.body.password, 10);
@@ -75,7 +74,6 @@ exports.signUp = async (req, res) => {
     res.status(400).json(err);
   }
 };
-
 
 exports.signIn = async (req, res) => {
   try {
@@ -116,9 +114,10 @@ exports.getUserDetails = async (req, res) => {
     // console.log(process.env.JWT_SECRET)
     // console.log(token)
     if (!token) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Authentication failed. Token missing." });
+      return res.status(401).json({
+        success: false,
+        message: "Authentication failed. Token missing.",
+      });
     }
     // const tokenValue = token.replace("Bearer || ", "");
     jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
@@ -142,20 +141,25 @@ exports.getUserDetails = async (req, res) => {
           .status(401)
           .json({ success: false, message: "Your token has been expired." });
       }
-  
+
       const userWithoutCircularReferences = user.toJSON();
       // console.log('User Details:', userWithoutCircularReferences);
       // console.log(user)
       if (user) {
         const data = {
           ...user._doc,
-          profile_img_url: `${req.protocol}://${req.get("host")}/${user.profile_img}`,
-          adhar_front_url: `${req.protocol}://${req.get("host")}/${user.adhar_front}`,
-          adhar_back_url: `${req.protocol}://${req.get("host")}/${user.adhar_back}`,
+          profile_img_url: `${req.protocol}://${req.get("host")}/${
+            user.profile_img
+          }`,
+          adhar_front_url: `${req.protocol}://${req.get("host")}/${
+            user.adhar_front
+          }`,
+          adhar_back_url: `${req.protocol}://${req.get("host")}/${
+            user.adhar_back
+          }`,
           pan_img_url: `${req.protocol}://${req.get("host")}/${user.pan_img}`,
         };
 
-        
         return res.status(200).json({
           success: true,
           message: "User details fetched successfully!",
@@ -190,9 +194,10 @@ exports.UpdateUserDetails = async (req, res) => {
   try {
     const token = req.header("Authorization");
     if (!token) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Authentication failed Token missing." });
+      return res.status(401).json({
+        success: false,
+        message: "Authentication failed Token missing.",
+      });
     }
     jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
       if (err) {
@@ -248,6 +253,26 @@ exports.logout = async (req, res) => {
 };
 
 
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+    port: 587,
+    secure:false,
+    auth: {
+      user: process.env.MAIL_USERNAME,
+      pass:process.env.MAIL_PASSWORD,
+    },
+  }
+);
+
+async function sendMail({ to, subject, text, html }) {
+  let info = await transporter.sendMail({
+      from: '"Ecommerce" <order@ecommerce.com>', // sender address
+      to,
+      subject,
+      html
+  });
+  return info;
+}
 
 exports.resetPasswordRequest = async (req, res) => {
   try {
@@ -258,12 +283,24 @@ exports.resetPasswordRequest = async (req, res) => {
         message: "User not found!",
       });
     }
-    const token = jwt.sign({ email: user.email}, "reset_password");
-    user.resetPasswordToken = token
-    await user.save()
-    return res
-      .status(200)
-      .json({ success: true, message: "Request has been sent successfully, Please check your email" });
+    const token = jwt.sign({ email: user.email }, "reset_password");
+    user.resetPasswordToken = token;
+    await user.save();
+    const resetPageLink =
+      "http://localhost:3000/reset_password?token=" +
+      token +
+      "&email=" +
+      req.body.email;
+    const data = { name: user.name, link: resetPageLink };
+    sendMail({
+      to: "vinodm0463@gmail.com",
+      html: resetPasswordTemplate(data),
+      subject: "Reset password",
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Request has been sent successfully, Please check your email",
+    });
   } catch (err) {
     console.error(err);
     return res
@@ -272,13 +309,13 @@ exports.resetPasswordRequest = async (req, res) => {
   }
 };
 
-
-
-
 exports.resetPassword = async (req, res) => {
   try {
     const { email, password, token } = req.body;
-    const user = await User.findOne({ email: email , resetPasswordToken:token });
+    const user = await User.findOne({
+      email: email,
+      resetPasswordToken: token,
+    });
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -287,10 +324,11 @@ exports.resetPassword = async (req, res) => {
     }
     const hash = bcrypt.hashSync(password, 10);
     user.password = hash;
-    await user.save()
-    return res
-      .status(200)
-      .json({ success: true, message: "Password has been changed successfully!" });
+    await user.save();
+    return res.status(200).json({
+      success: true,
+      message: "Password has been changed successfully!",
+    });
   } catch (err) {
     console.error(err);
     return res
@@ -299,12 +337,10 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
-
-
 exports.forgetPassword = async (req, res) => {
   try {
-    const { email, password , new_password} = req.body;
-    const user = await User.findOne({ email: email});
+    const { email, password, new_password } = req.body;
+    const user = await User.findOne({ email: email });
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -320,10 +356,11 @@ exports.forgetPassword = async (req, res) => {
     }
     const hash = bcrypt.hashSync(new_password, 10);
     user.password = hash;
-    await user.save()
-    return res
-      .status(200)
-      .json({ success: true, message: "Password has been changed successfully!" });
+    await user.save();
+    return res.status(200).json({
+      success: true,
+      message: "Password has been changed successfully!",
+    });
   } catch (err) {
     console.error(err);
     return res
@@ -331,8 +368,6 @@ exports.forgetPassword = async (req, res) => {
       .json({ success: false, message: "Internal Server Error" });
   }
 };
-
-
 
 exports.getAllUsersDetails = async (req, res) => {
   try {
@@ -397,9 +432,10 @@ exports.KycUpload = async (req, res) => {
   try {
     const token = req.header("Authorization");
     if (!token) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Authentication failed. Token missing." });
+      return res.status(401).json({
+        success: false,
+        message: "Authentication failed. Token missing.",
+      });
     }
 
     jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
@@ -412,9 +448,10 @@ exports.KycUpload = async (req, res) => {
 
       const { adhar_no, pan_no } = req.body;
       if (!adhar_no || !pan_no) {
-        return res
-          .status(400)
-          .json({ success: false, message: "adhar_no and pan_no are required." });
+        return res.status(400).json({
+          success: false,
+          message: "adhar_no and pan_no are required.",
+        });
       }
 
       // const user = new User({ adhar_no, pan_no });
@@ -460,9 +497,10 @@ exports.getKycDetails = async (req, res) => {
   try {
     const token = req.header("Authorization");
     if (!token) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Authentication failed. Token missing." });
+      return res.status(401).json({
+        success: false,
+        message: "Authentication failed. Token missing.",
+      });
     }
 
     jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {

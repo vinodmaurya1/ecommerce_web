@@ -102,15 +102,14 @@ const transporter = nodemailer.createTransport({
 );
 
 
-exports.sendMail = async function ({to, subject, text, html}){
+async function sendMail({ to, subject, text, html }) {
   let info = await transporter.sendMail({
       from: '"Ecommerce" <order@ecommerce.com>', // sender address
       to,
       subject,
-      text,
       html
-    });
-  return info;  
+  });
+  return info;
 }
 
 
@@ -138,7 +137,7 @@ router.post('/email_send', async (req,res)=>{
 
 module.exports = router;
 
-
+module.exports.sendMail = sendMail;
 // const authController = require('../controller/auth')
 // const express = require('express');
 // const router = express.Router();

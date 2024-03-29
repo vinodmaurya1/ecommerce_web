@@ -311,8 +311,8 @@ exports.invoiceTemplate = function (order) {
              <!-- start unsubscribe -->
              <tr>
                <td align="center" bgcolor="#D2C7BA" style="padding: 12px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: #666;">
-                 <p style="margin: 0;">To stop receiving these emails, you can <a href="https://sendgrid.com" target="_blank">unsubscribe</a> at any time.</p>
-                 <p style="margin: 0;">Paste 1234 S. Broadway St. City, State 12345</p>
+                 <p style="margin: 0;">To stop receiving these emails, you can <a href="#" target="_blank">unsubscribe</a> at any time.</p>
+                 <p style="margin: 0;">Delhi</p>
                </td>
              </tr>
              <!-- end unsubscribe -->
@@ -337,7 +337,7 @@ exports.invoiceTemplate = function (order) {
 
 
 
-exports.resetTemplate = function (data) {
+exports.resetPasswordTemplate = function (data) {
   return `<!DOCTYPE html>
   <html>
     <head>
@@ -836,9 +836,8 @@ exports.resetTemplate = function (data) {
                     <tr>
                       <td class="content-cell" align="center">
                         <p class="f-fallback sub align-center">
-                          [Company Name, LLC]
-                          <br>1234 Street Rd.
-                          <br>Suite 1234
+                          VID Team
+                          <br>Delhi
                         </p>
                       </td>
                     </tr>
